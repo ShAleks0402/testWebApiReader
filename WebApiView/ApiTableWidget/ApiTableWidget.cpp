@@ -9,4 +9,5 @@ ApiTableWidget::ApiTableWidget(QWidget *parent)
 {
     engine()->rootContext()->setContextProperty("ApiTableModel", _model.get());
     setSource(QUrl("qrc:/apiTableView.qml"));
+
 }

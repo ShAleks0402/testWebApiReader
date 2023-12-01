@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>apiTableView.qml</file>
+        <file>apiRecordView.qml</file>
     </qresource>
 </RCC>

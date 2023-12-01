@@ -59,13 +59,13 @@ void DataBase::exec(QScopedPointer<QSqlQuery> query)
         return;
     }
 
-    _mutex.lock();
+    //_mutex.lock();
     emit operate(QSharedPointer<QSqlQuery>(query.take()));
 }
 
 void DataBase::handleResults(QSharedPointer<QSqlQuery> query)
 {
-    _mutex.unlock();
+    //_mutex.unlock();
     emit execReady(query);
 }
 
