@@ -8,10 +8,15 @@
 
 #include <QtSql>
 
+#include <QMutex>
+QMutex _mutex;
+
 DataBase::DataBase(QObject *parent)
     : QObject{parent}
     , _webReader(new WebReader())
     , _dbFileName(QApplication::applicationDirPath() + "/db.sqlite")
+    , _worker(new Worker())
+    , _workerThread(new QThread())
 {
     if (!QFile::exists(_dbFileName))
         createDB();
@@ -21,12 +26,22 @@ DataBase::DataBase(QObject *parent)
     if (!_sdb.open())
         qDebug()<<"ERROR. DataBase. DB not open.";
 
+    qRegisterMetaType<QSharedPointer<QSqlQuery>>("QSharedPointer<QSqlQuery>");
+    _worker->moveToThread(_workerThread.get());
+    connect(_workerThread.get(), &QThread::finished, _worker.get(), &QObject::deleteLater);
+    connect(this, &DataBase::operate, _worker.get(), &Worker::doWork);
+    connect(_worker.get(), &Worker::resultReady, this, &DataBase::handleResults);
+    _workerThread->start();
+
     connect(_webReader.get(), &WebReader::newData, this, &DataBase::onUpdate);
     _webReader->start();
 }
 
 DataBase::~DataBase()
 {
+    _workerThread->quit();
+    _workerThread->wait();
+
     if (_sdb.isOpen())
         _sdb.close();
 }
@@ -39,11 +54,19 @@ void DataBase::start()
 void DataBase::exec(QScopedPointer<QSqlQuery> query)
 {
     if (!_sdb.isOpen())
+    {
+        qDebug()<<"ERROR. exec. DB not open.";
         return;
+    }
 
-    query->exec();
+    _mutex.lock();
+    emit operate(QSharedPointer<QSqlQuery>(query.take()));
+}
 
-    emit execReady(QSharedPointer<QSqlQuery>(query.take()));
+void DataBase::handleResults(QSharedPointer<QSqlQuery> query)
+{
+    _mutex.unlock();
+    emit execReady(query);
 }
 
 void DataBase::onUpdate(QSharedPointer<QJsonDocument> data)
@@ -112,4 +135,11 @@ void DataBase::createDB()
 
         sdb.close();
     }
+}
+
+void Worker::doWork(QSharedPointer<QSqlQuery> query)
+{
+    query->exec();
+
+    emit resultReady(query);
 }

@@ -39,7 +39,5 @@ private:
     QVector<QMap<QString, QVariant>> _data;
 
     QScopedPointer<DataBase> _dataBase;
-
-    //const DataBase& _dataBase;
 };
 
