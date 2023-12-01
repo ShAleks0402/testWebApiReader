@@ -21,10 +21,10 @@ signals:
     void execReady(QSharedPointer<QSqlQuery> query);
 
 private slots:
-    void onUpdate(const QJsonDocument& data);
+    void onUpdate(QSharedPointer<QJsonDocument> data);
 
 private:
-    void parseJson(const QJsonDocument& data);
+    void parseJson(QSharedPointer<QJsonDocument> data);
     void createDB();
 
 private:

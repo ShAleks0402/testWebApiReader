@@ -46,14 +46,14 @@ void DataBase::exec(QScopedPointer<QSqlQuery> query)
     emit execReady(QSharedPointer<QSqlQuery>(query.take()));
 }
 
-void DataBase::onUpdate(const QJsonDocument& data)
+void DataBase::onUpdate(QSharedPointer<QJsonDocument> data)
 {
     //parseJson(data);
 
     emit update();
 }
 
-void DataBase::parseJson(const QJsonDocument& data)
+void DataBase::parseJson(QSharedPointer<QJsonDocument> data)
 {
     if (!_sdb.isOpen())
     {
@@ -64,9 +64,9 @@ void DataBase::parseJson(const QJsonDocument& data)
     QSqlQuery query;
     query.exec("DELETE FROM entries");
 
-    if (data.isObject())
+    if (data->isObject())
     {
-        const auto json = data.object();
+        const auto json = data->object();
         //const auto elementsCount = json["count"].toInt();
 
         const auto jsonEntries = json["entries"].toArray();

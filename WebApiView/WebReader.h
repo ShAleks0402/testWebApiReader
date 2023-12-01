@@ -13,7 +13,7 @@ public:
     void start();
 
 signals:
-    void newData(const QJsonDocument& data);
+    void newData(QSharedPointer<QJsonDocument> data);
 
 private slots:
     void onReply(QNetworkReply* reply);

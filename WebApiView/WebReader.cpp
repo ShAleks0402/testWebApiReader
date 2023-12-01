@@ -22,6 +22,8 @@ void WebReader::onReply(QNetworkReply* reply)
         return;
     }
 
-    QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-    emit newData(doc);
+    emit newData(QSharedPointer<QJsonDocument>(
+                     new QJsonDocument(QJsonDocument::fromJson(reply->readAll()))
+                     )
+                 );
 }

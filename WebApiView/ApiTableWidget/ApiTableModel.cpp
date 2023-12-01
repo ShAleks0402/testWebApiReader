@@ -13,14 +13,10 @@ ApiTableModel::ApiTableModel(QObject *parent)
 
 QVariant ApiTableModel::data(const QModelIndex& index, int role) const
 {
-    return QVariant();
-
     const auto temp = roleNames();
     const auto key =  temp.value(role);
 
-    _data[index.row()].value(key);
-
-    return QVariant();
+    return _data[index.row()].value(key);
 }
 
 int ApiTableModel::rowCount(const QModelIndex& parent) const
@@ -37,7 +33,8 @@ void ApiTableModel::onUpdate()
 {
     QScopedPointer<QSqlQuery> query(new QSqlQuery);
 
-    query->prepare("SELECT api, description, link, auth, category FROM entries");
+    query->prepare("SELECT entries.api, description, link, auth, category, comments.comment FROM entries "
+                   "LEFT JOIN comments ON entries.api = comments.api");
     _dataBase->exec(QScopedPointer<QSqlQuery>(query.take()));
 }
 
@@ -47,12 +44,14 @@ void ApiTableModel::onExecReady(QSharedPointer<QSqlQuery> query)
 
     QSqlRecord rec = query->record();
 
-    const int indexAPI          = rec.indexOf( "API" );
-    const int indexDescription  = rec.indexOf( "Description" );
-    const int indexAuth         = rec.indexOf( "Auth" );
+    const int indexAPI          = rec.indexOf( "api" );
+    const int indexDescription  = rec.indexOf( "description" );
+    const int indexAuth         = rec.indexOf( "auth" );
     const int indexLink         = rec.indexOf( "Link" );
-    const int indexCategory     = rec.indexOf( "Category" );
+    const int indexCategory     = rec.indexOf( "category" );
+    const int indexComments     = rec.indexOf( "comments" );
 
+    beginResetModel();
     while (query->next())
     {
         _data.push_back(QMap<QString, QVariant>());
@@ -62,7 +61,9 @@ void ApiTableModel::onExecReady(QSharedPointer<QSqlQuery> query)
         _data.back()["RolesLink"]           = query->value(indexAuth);
         _data.back()["RolesAuth"]           = query->value(indexLink);
         _data.back()["RolesCategory"]       = query->value(indexCategory);
+        _data.back()["RolesComments"]       = query->value(indexComments);
     }
+    endResetModel();
 }
 
 QHash<int, QByteArray> ApiTableModel::roleNames() const

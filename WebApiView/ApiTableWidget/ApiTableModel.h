@@ -17,7 +17,8 @@ public:
         RolesDescription,              // Описание
         RolesLink,                     // Ссылка
         RolesAuth,                     // Авторизация
-        RolesCategory                  // Категория
+        RolesCategory,                 // Категория
+        RolesComments,                 // Комментарий
     };
     Q_ENUM(ApiTableRoles)
 

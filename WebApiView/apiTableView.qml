@@ -20,6 +20,12 @@ Item {
             title: "Категория"
         }
 
+        TableViewColumn
+        {
+            role: "RolesComments"
+            title: "Комментарий"
+        }
+
         model: ApiTableModel
     }
 }
