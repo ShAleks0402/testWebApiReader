@@ -145,6 +145,7 @@ void DataBase::createDB()
     }
 }
 
+// TODO: уйти от QSqlQuery, передавать QString. Придется открывать файл с базой.
 void Worker::doWork(QSharedPointer<QSqlQuery> query)
 {
     query->exec();
