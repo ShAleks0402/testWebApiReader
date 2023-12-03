@@ -34,7 +34,6 @@ DataBase::DataBase(QObject *parent)
     _workerThread->start();
 
     connect(_webReader.get(), &WebReader::newData, this, &DataBase::onUpdate);
-    _webReader->start();
 }
 
 DataBase::~DataBase()
@@ -51,6 +50,7 @@ void DataBase::start()
     _webReader->start();
 }
 
+// TODO: уйти от query, QScopedPointer заставляет отдать управление.
 void DataBase::exec(QScopedPointer<QSqlQuery> query)
 {
     if (!_sdb.isOpen())
@@ -59,19 +59,20 @@ void DataBase::exec(QScopedPointer<QSqlQuery> query)
         return;
     }
 
-    //_mutex.lock();
+    //_mutex.lock(); TODO: для отладки
+    // TODO: по хорошенму нужен пул потоков.
     emit operate(QSharedPointer<QSqlQuery>(query.take()));
 }
 
 void DataBase::handleResults(QSharedPointer<QSqlQuery> query)
 {
-    //_mutex.unlock();
+    //_mutex.unlock(); TODO: для отладки
     emit execReady(query);
 }
 
 void DataBase::onUpdate(QSharedPointer<QJsonDocument> data)
 {
-    //parseJson(data);
+    parseJson(data);
 
     emit update();
 }
@@ -84,26 +85,33 @@ void DataBase::parseJson(QSharedPointer<QJsonDocument> data)
         return;
     }
 
+    // TODO: по хорошему надо выставлять visible в false.
     QSqlQuery query;
     query.exec("DELETE FROM entries");
 
-    if (data->isObject())
+    if (data->isArray())
     {
-        const auto json = data->object();
-        //const auto elementsCount = json["count"].toInt();
+        const auto jsonEntries = data->array();
 
-        const auto jsonEntries = json["entries"].toArray();
         for (const auto& jsonEntrie: jsonEntries)
         {
             if (jsonEntrie.isObject())
             {
-                QString queryString("INSERT INTO entries (api, description, link, auth, category) "
-                                    "VALUES ('%1', '%2', '%3', '%4', '%5')");
-                queryString = queryString.arg(jsonEntrie.toObject()["API"].toString(),
-                                              jsonEntrie.toObject()["Description"].toString(),
-                                              jsonEntrie.toObject()["Auth"].toString(),
-                                              jsonEntrie.toObject()["Link"].toString(),
-                                              jsonEntrie.toObject()["Category"].toString());
+                QString queryString("INSERT INTO entries (name, country, web_page, domain) "
+                                    "VALUES ('%1', '%2', '%3', '%4')");
+
+                // TODO: По хорошему надо проверять наличие Array.
+                try
+                {
+                    queryString = queryString.arg(jsonEntrie.toObject()["name"].toString(),
+                                                  jsonEntrie.toObject()["country"].toString(),
+                                                  jsonEntrie.toObject()["web_page"].toArray().at(0).toString(),
+                                                  jsonEntrie.toObject()["domain"].toArray().at(0).toString()
+                                                  );
+                }
+                catch(...)
+                {
+                }
 
                 if (!query.exec(queryString))
                     qDebug()<<"ERROR. parseJson. INSERT INTO.";
@@ -112,6 +120,7 @@ void DataBase::parseJson(QSharedPointer<QJsonDocument> data)
     }
 }
 
+// TODO: нужно вынести обработку в отдельный поток.
 void DataBase::createDB()
 {
     QSqlDatabase sdb = QSqlDatabase::addDatabase("QSQLITE");
@@ -121,15 +130,14 @@ void DataBase::createDB()
     {
         QSqlQuery query;
         if (!query.exec("CREATE TABLE entries (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                                              "api TEXT,"
-                                              "description TEXT,"
-                                              "link TEXT,"
-                                              "auth TEXT,"
-                                              "category TEXT,"
+                                              "name TEXT,"
+                                              "web_page TEXT,"
+                                              "domain TEXT,"
+                                              "country TEXT,"
                                               "visible BOOL)"))
             qDebug()<<"ERROR. createDB. CREATE TABLE entries.";
 
-        if (!query.exec("CREATE TABLE comments (api TEXT,"
+        if (!query.exec("CREATE TABLE comments (name TEXT,"
                         "comment TEXT)"))
             qDebug()<<"ERROR. createDB. CREATE TABLE comments.";
 

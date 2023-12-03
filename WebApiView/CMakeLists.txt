@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Qml Quick Gui QuickWidgets Sql)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets  Qml Quick Gui QuickWidgets Sql)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Qml Quick Gui QuickWidgets Sql Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets  Qml Quick Gui QuickWidgets Sql Network)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -60,6 +60,10 @@ target_link_libraries(WebApiView PRIVATE Qt${QT_VERSION_MAJOR}::Qml)
 target_link_libraries(WebApiView PRIVATE Qt${QT_VERSION_MAJOR}::Quick)
 target_link_libraries(WebApiView PRIVATE Qt${QT_VERSION_MAJOR}::QuickWidgets)
 target_link_libraries(WebApiView PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(WebApiView PRIVATE Qt${QT_VERSION_MAJOR}::Network)
+
+#link_directories("~Work/openssl-1.1.1q -lcrypto -L~Work/openssl-1.1.1q -lssl")
+#OPENSSL_LINKING_MODE = "-linked"
 
 set_target_properties(WebApiView PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

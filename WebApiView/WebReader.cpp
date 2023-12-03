@@ -1,6 +1,7 @@
 #include "WebReader.h"
 
 #include <QDebug>
+#include <QNetworkReply>
 
 WebReader::WebReader(QObject *parent)
     : QObject{parent}
@@ -11,7 +12,11 @@ WebReader::WebReader(QObject *parent)
 
 void WebReader::start()
 {
-    _netManager->get(QNetworkRequest(QUrl("https://api.publicapis.org/entries")));
+    // Работает асинхронно
+    _netManager->get(QNetworkRequest(QUrl("http://universities.hipolabs.com/search?country=Kazakhstan")));
+
+    // TODO: список бесплатных API. Есть проблемы по запросу (SSL). Разобраться почему на некоторых ПК выдает reply->error().
+    //_netManager->get(QNetworkRequest(QUrl("https://api.publicapis.org/entries")));
 }
 
 void WebReader::onReply(QNetworkReply* reply)

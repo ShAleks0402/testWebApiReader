@@ -2,7 +2,6 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QJsonDocument>
 
 class WebReader : public QObject

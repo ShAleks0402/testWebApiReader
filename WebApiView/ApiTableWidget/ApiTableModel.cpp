@@ -33,8 +33,8 @@ void ApiTableModel::onUpdate()
 {
     QScopedPointer<QSqlQuery> query(new QSqlQuery);
 
-    query->prepare("SELECT entries.api, description, link, auth, category, comments.comment FROM entries "
-                   "LEFT JOIN comments ON entries.api = comments.api");
+    query->prepare("SELECT entries.name, country, web_page, domain, comments.comment FROM entries "
+                   "LEFT JOIN comments ON entries.name = comments.name");
     _dataBase->exec(QScopedPointer<QSqlQuery>(query.take()));
 }
 
@@ -44,24 +44,22 @@ void ApiTableModel::onExecReady(QSharedPointer<QSqlQuery> query)
 
     QSqlRecord rec = query->record();
 
-    const int indexAPI          = rec.indexOf( "api" );
-    const int indexDescription  = rec.indexOf( "description" );
-    const int indexAuth         = rec.indexOf( "auth" );
-    const int indexLink         = rec.indexOf( "Link" );
-    const int indexCategory     = rec.indexOf( "category" );
-    const int indexComments     = rec.indexOf( "comments" );
+    const int indexName     = rec.indexOf( "name" );
+    const int indexCountry  = rec.indexOf( "country" );
+    const int indexWebPage  = rec.indexOf( "web_page" );
+    const int indexDomain   = rec.indexOf( "domain" );
+    const int indexComments = rec.indexOf( "comments" );
 
     beginResetModel();
     while (query->next())
     {
         _data.push_back(QMap<QString, QVariant>());
 
-        _data.back()["RolesAPI"]            = query->value(indexAPI);
-        _data.back()["RolesDescription"]    = query->value(indexDescription);
-        _data.back()["RolesLink"]           = query->value(indexAuth);
-        _data.back()["RolesAuth"]           = query->value(indexLink);
-        _data.back()["RolesCategory"]       = query->value(indexCategory);
-        _data.back()["RolesComments"]       = query->value(indexComments);
+        _data.back()["RolesName"]       = query->value(indexName);
+        _data.back()["RolesWebPage"]    = query->value(indexWebPage);
+        _data.back()["RolesDomain"]     = query->value(indexDomain);
+        _data.back()["RolesCountry"]    = query->value(indexCountry);
+        _data.back()["RolesComments"]   = query->value(indexComments);
     }
     endResetModel();
 }

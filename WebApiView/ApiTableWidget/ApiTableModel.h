@@ -13,12 +13,11 @@ class ApiTableModel: public QAbstractTableModel
 public:
     enum ApiTableRoles
     {
-        RolesAPI = Qt::UserRole + 1,   // Название
-        RolesDescription,              // Описание
-        RolesLink,                     // Ссылка
-        RolesAuth,                     // Авторизация
-        RolesCategory,                 // Категория
-        RolesComments,                 // Комментарий
+        RolesName = Qt::UserRole + 1,   // Название
+        RolesWebPage,                   // Web страница
+        RolesDomain,                    // Домин
+        RolesCountry,                   // Регион
+        RolesComments,                  // Комментарий
     };
     Q_ENUM(ApiTableRoles)
 

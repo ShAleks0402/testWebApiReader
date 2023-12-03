@@ -21,14 +21,14 @@ Item {
 
         TableViewColumn
         {
-            role: "RolesAPI"
+            role: "RolesName"
             title: "Название"
         }
 
         TableViewColumn
         {
-            role: "RolesCategory"
-            title: "Категория"
+            role: "RolesWebPage"
+            title: "Web страница"
         }
 
         TableViewColumn
