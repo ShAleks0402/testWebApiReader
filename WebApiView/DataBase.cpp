@@ -105,8 +105,8 @@ void DataBase::parseJson(QSharedPointer<QJsonDocument> data)
                 {
                     queryString = queryString.arg(jsonEntrie.toObject()["name"].toString(),
                                                   jsonEntrie.toObject()["country"].toString(),
-                                                  jsonEntrie.toObject()["web_page"].toArray().at(0).toString(),
-                                                  jsonEntrie.toObject()["domain"].toArray().at(0).toString()
+                                                  jsonEntrie.toObject()["web_pages"].toArray().begin()->toString(),
+                                                  jsonEntrie.toObject()["domains"].toArray().at(0).toString()
                                                   );
                 }
                 catch(...)
