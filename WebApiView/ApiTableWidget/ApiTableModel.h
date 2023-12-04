@@ -5,10 +5,12 @@
 #include <QObject>
 #include <QAbstractTableModel>
 #include <QtCore/QMetaEnum>
+#include <qqml.h>
 
 class ApiTableModel: public QAbstractTableModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     enum ApiTableRoles
@@ -23,9 +25,11 @@ public:
 
     explicit ApiTableModel(QObject *parent = 0);
 
-    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
+    Q_INVOKABLE QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
+
+    Q_INVOKABLE QVariant itemData(int row, int column);
 
 private slots:
     void onUpdate();

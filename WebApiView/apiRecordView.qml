@@ -24,11 +24,46 @@ ApplicationWindow
             color: "red"
         }
 
+        Text
+        {
+            text: window.web_page
+            font.pointSize: 24
+            color: "red"
+        }
+
+        Text
+        {
+            text: window.domain
+            font.pointSize: 24
+            color: "red"
+        }
+
+        Text
+        {
+            text: window.country
+            font.pointSize: 24
+            color: "red"
+        }
+
+        TextInput
+        {
+            id: input
+            anchors.fill: parent
+            text: window.comment
+            font.pointSize: 24
+            color: "red"
+            focus: true
+
+            onEditingFinished: {
+                                        console.log(text)
+                                   }
+        }
+
         Button
         {
             id: saveButton
             text: "Save"
-            onClicked: popup.open()
+            onClicked: window.close()
         }
      }
 

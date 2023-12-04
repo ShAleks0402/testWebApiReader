@@ -11,7 +11,7 @@ ApiTableModel::ApiTableModel(QObject *parent)
     _dataBase->start();
 }
 
-QVariant ApiTableModel::data(const QModelIndex& index, int role) const
+Q_INVOKABLE QVariant ApiTableModel::data(const QModelIndex& index, int role) const
 {
     const auto temp = roleNames();
     const auto key =  temp.value(role);
@@ -27,6 +27,15 @@ int ApiTableModel::rowCount(const QModelIndex& parent) const
 int ApiTableModel::columnCount(const QModelIndex& parent) const
 {
     return roleNames().size();
+}
+
+Q_INVOKABLE QVariant ApiTableModel::itemData(int row, int column)
+{
+    QVariant rVal = data(this->index(row, column), column + RolesName);
+    if (rVal.isValid())
+        return rVal;
+
+    return QVariant("");
 }
 
 void ApiTableModel::onUpdate()
