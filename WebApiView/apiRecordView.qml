@@ -58,11 +58,6 @@ ApplicationWindow
             focus: true
 
             layer.enabled: true
-
-
-            onEditingFinished: {
-                                        console.log(text)
-                                   }
         }
 
         Button

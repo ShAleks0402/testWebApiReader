@@ -35,7 +35,6 @@ Item {
         }
 
         function onSave(str) {
-            console.log("Sending to email: ")
             ApiTableModel.save(tableView.row, str)
         }
 
