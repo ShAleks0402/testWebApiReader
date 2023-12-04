@@ -15,6 +15,8 @@ ApplicationWindow
     property string country:""
     property string comment:""
 
+    signal qmlSaveSignal(string str)
+
      ColumnLayout
      {
         Text
@@ -67,7 +69,12 @@ ApplicationWindow
         {
             id: saveButton
             text: "Save"
-            onClicked: window.close()
+
+            onClicked: {
+
+                qmlSaveSignal(input.text)
+                window.close()
+            }
         }
      }
 

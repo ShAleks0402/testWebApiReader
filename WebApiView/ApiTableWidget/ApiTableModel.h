@@ -31,6 +31,8 @@ public:
 
     Q_INVOKABLE QVariant itemData(int row, int column);
 
+    Q_INVOKABLE void save(int row, const QString& comment);
+
 private slots:
     void onUpdate();
     void onExecReady(QSharedPointer<QSqlQuery> data);

@@ -38,6 +38,7 @@ DataBase::DataBase(QObject *parent)
 
 DataBase::~DataBase()
 {
+    // TODO: падение на выходе QScopedPointer<Worker>
     _workerThread->quit();
     _workerThread->wait();
 
@@ -88,6 +89,7 @@ void DataBase::parseJson(QSharedPointer<QJsonDocument> data)
     // TODO: по хорошему надо выставлять visible в false.
     QSqlQuery query;
     query.exec("DELETE FROM entries");
+    query.exec("DELETE FROM comments WHERE comment=''");
 
     if (data->isArray())
     {

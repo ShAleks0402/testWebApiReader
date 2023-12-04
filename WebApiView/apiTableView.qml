@@ -16,6 +16,7 @@ Item {
         anchors.fill: parent
 
         model: ApiTableModel
+        property int row
 
         onDoubleClicked:
         {
@@ -26,9 +27,18 @@ Item {
             window.domain = ApiTableModel.itemData(row, "2")
             window.country = ApiTableModel.itemData(row, "3")
             window.comment = ApiTableModel.itemData(row, "4")
+            tableView.row = row;
+
+            window.qmlSaveSignal.connect(onSave)
 
             window.show()
         }
+
+        function onSave(str) {
+            console.log("Sending to email: ")
+            ApiTableModel.save(tableView.row, str)
+        }
+
 
         TableViewColumn
         {

@@ -7,7 +7,7 @@ ApiTableModel::ApiTableModel(QObject *parent)
     , _dataBase(new DataBase())
 {
     connect(_dataBase.get(), &DataBase::update, this, &ApiTableModel::onUpdate);
-    connect(_dataBase.get(), &DataBase::execReady, this, &ApiTableModel::onExecReady);
+
     _dataBase->start();
 }
 
@@ -38,8 +38,30 @@ Q_INVOKABLE QVariant ApiTableModel::itemData(int row, int column)
     return QVariant("");
 }
 
+Q_INVOKABLE void ApiTableModel::save(int row, const QString& comment)
+{
+    bool newComment = !_data[row].contains("RolesComments");
+
+    beginResetModel();
+    _data[row]["RolesComments"] = comment;
+    endResetModel();
+
+    QScopedPointer<QSqlQuery> query(new QSqlQuery);
+    QString queryString;
+    if (newComment)
+        queryString = "INSERT INTO comments (name, comment) VALUES('%1', '%2')";
+    else
+        queryString = "UPDATE comments SET comment='%2' WHERE name='%1'";
+
+    queryString = queryString.arg(_data[row]["RolesName"].toString(), comment);
+
+    query->prepare(queryString);
+    _dataBase->exec(QScopedPointer<QSqlQuery>(query.take()));
+}
+
 void ApiTableModel::onUpdate()
 {
+    connect(_dataBase.get(), &DataBase::execReady, this, &ApiTableModel::onExecReady);
     QScopedPointer<QSqlQuery> query(new QSqlQuery);
 
     query->prepare("SELECT entries.name, country, web_page, domain, comments.comment FROM entries "
@@ -49,6 +71,8 @@ void ApiTableModel::onUpdate()
 
 void ApiTableModel::onExecReady(QSharedPointer<QSqlQuery> query)
 {
+    disconnect(_dataBase.get(), &DataBase::execReady, this, &ApiTableModel::onExecReady);
+
     _data.clear();
 
     QSqlRecord rec = query->record();
@@ -57,7 +81,7 @@ void ApiTableModel::onExecReady(QSharedPointer<QSqlQuery> query)
     const int indexCountry  = rec.indexOf( "country" );
     const int indexWebPage  = rec.indexOf( "web_page" );
     const int indexDomain   = rec.indexOf( "domain" );
-    const int indexComments = rec.indexOf( "comments" );
+    const int indexComments = rec.indexOf( "comment" );
 
     beginResetModel();
     while (query->next())
@@ -68,7 +92,10 @@ void ApiTableModel::onExecReady(QSharedPointer<QSqlQuery> query)
         _data.back()["RolesWebPage"]    = query->value(indexWebPage);
         _data.back()["RolesDomain"]     = query->value(indexDomain);
         _data.back()["RolesCountry"]    = query->value(indexCountry);
-        _data.back()["RolesComments"]   = query->value(indexComments);
+
+        const auto value = query->value(indexComments);
+        if (!value.toString().isEmpty())
+            _data.back()["RolesComments"] = value;
     }
     endResetModel();
 }
