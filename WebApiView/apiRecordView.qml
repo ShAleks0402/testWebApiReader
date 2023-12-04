@@ -7,7 +7,7 @@ ApplicationWindow
 {
     id: window
     width: 400
-    height: 400
+    height: 600
     visible: true
     property string name:""
     property string web_page:""
@@ -51,8 +51,12 @@ ApplicationWindow
             anchors.fill: parent
             text: window.comment
             font.pointSize: 24
-            color: "red"
+            anchors.margins: 2
+            color: "green"
             focus: true
+
+            layer.enabled: true
+
 
             onEditingFinished: {
                                         console.log(text)
